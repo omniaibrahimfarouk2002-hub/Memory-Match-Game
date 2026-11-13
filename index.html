@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الذاكرة - Memory Match</title>
+<style>
+body{font-family:Arial;text-align:center;background:#fef3ff;margin:0;padding:20px}
+h1{color:#7c3aed}
+#info{font-size:18px;margin:10px}
+#grid{display:grid;grid-template-columns:repeat(4,80px);gap:10px;justify-content:center;margin:20px auto}
+.card{width:80px;height:80px;background:#a78bfa;color:white;font-size:35px;display:flex;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;user-select:none}
+.card.open{background:white;color:#333;box-shadow:0 0 0 2px #a78bfa}
+.card.matched{background:#bbf7d0;cursor:default}
+button{padding:10px 20px;background:#7c3aed;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>🧠 لعبة الذاكرة</h1>
+<div id="info">المحاولات: <span id="tries">0</span> | الصح: <span id="score">0</span></div>
+<div id="grid"></div>
+<button onclick="startGame()">العب من جديد 🔄</button>
+<p id="msg"></p>
+<script>
+let emojis=['🍎','🍌','🍓','🍇','🍕','🍩','⚽','🎮'];
+let cards=[],first=null,lock=false,tries=0,score=0;
+function startGame(){
+  let all=[...emojis,...emojis].sort(()=>Math.random()-0.5);
+  let grid=document.getElementById('grid'); grid.innerHTML='';
+  cards=[]; first=null; lock=false; tries=0; score=0;
+  document.getElementById('tries').textContent='0';
+  document.getElementById('score').textContent='0';
+  document.getElementById('msg').textContent='';
+  all.forEach(e=>{
+    let d=document.createElement('div'); d.className='card'; d.textContent='?'; d.dataset.v=e;
+    d.onclick=()=>{
+      if(lock||d.classList.contains('open')||d.classList.contains('matched')) return;
+      d.classList.add('open'); d.textContent=e;
+      if(!first){ first=d; return; }
+      tries++; document.getElementById('tries').textContent=tries;
+      if(first.dataset.v===e){
+        first.classList.add('matched'); d.classList.add('matched');
+        score++; document.getElementById('score').textContent=score;
+        first=null;
+        if(score===8) document.getElementById('msg').textContent='🎉 برافو يا أمنية! كسبتي!';
+      } else {
+        lock=true; let f=first; first=null;
+        setTimeout(()=>{ f.classList.remove('open'); f.textContent='?'; d.classList.remove('open'); d.textContent='?'; lock=false; },800);
+      }
+    };
+    grid.appendChild(d);
+  });
+}
+startGame();
+</script>
+</body>
+</html>
